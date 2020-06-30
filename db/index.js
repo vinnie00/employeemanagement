@@ -8,8 +8,14 @@ class DB {
             "select employee.id, employee.first_name, employee.last_name, role.title, manager.first_name from employee left join role on employee.role_id = role.id left join employee manager on employee.manager_id = manager.id"
         )
     }
+    // findEmployeesByManager(managerId) {
+    //     return this.connection.query("select employee.id, employee.first_name, employee.last_name, role.title, manager.first_name from employee left join role on employee.role_id = role.id left join employee manager on employee.manager_id = manager.id where manager_id = ?", managerId)
+    // }
     findEmployeesByManager(managerId) {
-        return this.connection.query("select employee.id, employee.first_name, employee.last_name, role.title, manager.first_name from employee left join role on employee.role_id = role.id left join employee manager on employee.manager_id = manager.id where manager_id = ?", managerId)
+    return this.connection.query(
+        "SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id WHERE manager_id = ?;",
+        managerId
+      );
     }
     findEmployeesByDepartment(departmentId) {
         return this.connection.query("select employee.id, employee.first_name, employee.last_name, role.title from employee left join role on employee.role_id = role.id left join department department on role.department_id = department.id where department_id = ?", departmentId)
@@ -49,5 +55,11 @@ class DB {
           "SELECT role.id, role.title, department.name AS department, role.salary FROM role LEFT JOIN department on role.department_id = department.id;"
         );
       }
+    addRole(role) {
+        return this.connection.query(
+            "insert into role set ?", 
+            role
+        )
+    }
 }
 module.exports = new DB(connection)
